@@ -4,33 +4,43 @@ Created on Thu Apr 11 13:03:49 2019
 
 @author: s525189
 """
+
 import matplotlib.pyplot as plt
 import numpy as np
 X=[]
 Y= []
 h=[]
-temp = []
-X_in = 0
-Y_in = 0
 S_temp=[]
 S=[]
 
-from pandas.plotting import scatter_matrix
+
+def helper(expr, first, last):
+    values = []
+    if((first-last)<=0.5):
+        diff = 0.01
+    else:
+        diff = 0.05
+    xvals = np.arange(first, last, diff) # Grid of 0.01 spacing from -2 to 10
+    #print(xvals)
+    for j in xvals:
+        values.append(eval(expr.replace('x',str(j))))
+    return xvals,values
+
+
+
 spline = int(input("Enter 1 for natural spline or 2 for clamped spline"))
+
+f = open("Values.txt", "r")
+n = 0
+for x in f:
+  y = x.split(' ')
+  X.append(int(y[0]))
+  Y.append(int(y[1]))
+  n = n+1
 if(spline == 1):
     #Take matrix size as input
-    n=int(input("Enter the number of (x,y) you want to enter "))
-   
-    
-    for i in range(n):
-        X_in =float(input("Enter the value for X  "))
-        Y_in = float(input("Enter the value for Y  "))
-        X.append(X_in)
-        Y.append(Y_in)
     for i in range(n-1):
         h.append(X[i+1] - X[i])
-    print(h)
-    
     #initialise nxn matrix with zeroes
     mat=np.zeros((n,n))
     mat[0][0] =1
@@ -51,23 +61,20 @@ if(spline == 1):
     b = [(((Y[i+1]-Y[i])/h[i]) - ((2*c[i]+c[i+1])*h[i]/3)) for i in range(n-1)]
     d = [(c[i+1]-c[i])/(3*h[i]) for i in range(n-1)]
     for i in range(n-1):
-        print("S",i,"(X) = ", Y[i],"+",b[i][0].item(0),"(x-",X[i],")","+",c[i][0].item(0),"(x-",X[i],")^2","+",d[i][0].item(0),"(x-",X[i],")^3", "for ",X[i],"<=x<",X[i+1])
+        z = str(Y[i])+"+"+str(b[i][0].item(0))+"*(x-"+str(X[i])+")"+"+"+str(c[i][0].item(0))+"*(x-"+str(X[i])+")**2"+"+"+str(d[i][0].item(0))+"*(x-"+str(X[i])+")**3"
+        print("S(",i,"X) = ",z)
+        X_val,S_temp = helper(z, X[i], X[i+1])
+        plt.scatter(x=X_val, y=S_temp, marker="o")
+        #print("S",i,"(X) = ", Y[i],"+",b[i][0].item(0),"*(x-",X[i],")","+",c[i][0].item(0),"*(x-",X[i],")**2","+",d[i][0].item(0),"*(x-",X[i],")**3", "for ",X[i],"<=x<",X[i+1])
+        #print(eval((z)))
         print()
 
 else:
-    n=int(input("Enter the number of (x,y) you want to enter "))
-    
-    for i in range(n):
-        X_in =float(input("Enter the value for X"))
-        Y_in = float(input("Enter the value for Y"))
-        X.append(X_in)
-        Y.append(Y_in)
     for i in range(n-1):
         h.append(X[i+1] - X[i])
-    alph = float(input("Enter the value for alpha"))
-    bet = float(input("Enter the value for beta"))
- 
-    
+    alph = float(input("Enter the value for alpha "))
+    bet = float(input("Enter the value for beta "))
+
     #initialise nxn matrix with zeroes
     mat=np.zeros((n,n))
     mat[0][0] =2*h[0]
@@ -93,15 +100,25 @@ else:
     b = [(((Y[i+1]-Y[i])/h[i]) - ((2*c[i]+c[i+1])*h[i]/3)) for i in range(n-1)]
     d = [(c[i+1]-c[i])/(3*h[i]) for i in range(n-1)]
     for i in range(n-1):
-        z = Y[i],"+",b[i][0].item(0),"*(x-",X[i],")","+",c[i][0].item(0),"*(x-",X[i],")**2","+",d[i][0].item(0),"*(x-",X[i],")**3"
-        S_temp.append(z)
-        
-       # print("S",i,"(X) = ", Y[i],"+",b[i][0].item(0),"*(x-",X[i],")","+",c[i][0].item(0),"*(x-",X[i],")**2","+",d[i][0].item(0),"*(x-",X[i],")**3", "for ",X[i],"<=x<",X[i+1])
-        print(S)
+        z = str(Y[i])+"+"+str(b[i][0].item(0))+"*(x-"+str(X[i])+")"+"+"+str(c[i][0].item(0))+"*(x-"+str(X[i])+")**2"+"+"+str(d[i][0].item(0))+"*(x-"+str(X[i])+")**3"
+        print("S(",i,"X) = ",z)
+        X_val,S_temp = helper(z, X[i], X[i+1])
+        plt.scatter(x=X_val, y=S_temp, marker="o")
+        #print("S",i,"(X) = ", Y[i],"+",b[i][0].item(0),"*(x-",X[i],")","+",c[i][0].item(0),"*(x-",X[i],")**2","+",d[i][0].item(0),"*(x-",X[i],")**3", "for ",X[i],"<=x<",X[i+1])
+        #print(eval((z)))
         print()
-plt.scatter(x=X, y=Y, marker="^")
+
 plt.show()
 
+
+
+        
+        
+
+
+        
+        
+        
 
 
 
